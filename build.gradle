@@ -1,0 +1,15 @@
+plugins {
+    id "java"
+}
+
+group "com.navercorp"
+version "1.0.0-SNAPSHOT"
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}
