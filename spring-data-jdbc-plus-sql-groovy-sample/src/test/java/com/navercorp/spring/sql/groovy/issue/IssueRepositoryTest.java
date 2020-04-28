@@ -134,6 +134,33 @@ class IssueRepositoryTest {
     }
 
     @Test
+    void update() {
+        // given
+        Issue issue = this.issues.get(0);
+        this.sut.save(issue);
+
+        IssueContent newContent = new IssueContent("spring-data-jdbc", "text/markdown");
+        issue.changeContent(newContent);
+
+        // when
+        Issue actual = this.sut.save(issue);
+
+        // then
+        assertThat(actual.getVersion()).isEqualTo(2L);
+
+        Optional<Issue> load = this.sut.findById(actual.getId());
+        assertThat(load).isPresent();
+        assertThat(load.get().getId()).isEqualTo(actual.getId());
+        assertThat(load.get().getVersion()).isEqualTo(2L);
+        assertThat(load.get().getRepoId()).isEqualTo(this.repoId);
+        assertThat(load.get().getStatus()).isEqualTo(Status.OPEN);
+        assertThat(load.get().getTitle()).isEqualTo("issue 1");
+        assertThat(load.get().getContent().getBody()).isEqualTo("spring-data-jdbc");
+        assertThat(load.get().getContent().getMimeType()).isEqualTo("text/markdown");
+        assertThat(load.get().getCreatedBy()).isEqualTo(this.creatorId);
+    }
+
+    @Test
     void optimisticLockingFailure(@Autowired TransactionTemplate transactionTemplate) {
         Issue issue = this.issues.get(0);
         this.sut.save(issue);

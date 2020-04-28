@@ -15,7 +15,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -113,6 +112,33 @@ class IssueRepositoryTest {
 
             assertThat(load.get().getAttachedLabels().get(0).getId()).isEqualTo(1L);
             assertThat(load.get().getAttachedLabels().get(1).getId()).isEqualTo(2L);
+            return null;
+        });
+    }
+
+    @Test
+    void changeStatus(@Autowired TransactionTemplate transactionTemplate) {
+        // given
+        Issue issue = this.issues.get(0);
+        this.sut.save(issue);
+
+        // when
+        int actual = this.sut.changeStatus(issue.getId(), Status.CLOSED);
+
+        // then
+        assertThat(actual).isEqualTo(1);
+
+        transactionTemplate.execute(status -> {
+            Optional<Issue> load = this.sut.findById(issue.getId());
+            assertThat(load).isPresent();
+            assertThat(load.get().getId()).isEqualTo(issue.getId());
+            assertThat(load.get().getVersion()).isEqualTo(2L);
+            assertThat(load.get().getRepoId()).isEqualTo(this.repoId);
+            assertThat(load.get().getStatus()).isEqualTo(Status.CLOSED);
+            assertThat(load.get().getTitle()).isEqualTo("issue 1");
+            assertThat(load.get().getContent().getBody()).isEqualTo("content 1");
+            assertThat(load.get().getContent().getMimeType()).isEqualTo("text/plain");
+            assertThat(load.get().getCreatedBy()).isEqualTo(this.creatorId);
             return null;
         });
     }

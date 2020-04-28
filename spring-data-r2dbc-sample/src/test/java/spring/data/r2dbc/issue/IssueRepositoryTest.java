@@ -157,6 +157,29 @@ class IssueRepositoryTest {
     }
 
     @Test
+    void update() {
+        Issue issue = this.issues.get(0);
+        this.sut.save(issue).block();
+
+        StepVerifier.create(this.sut.changeStatus(issue.getId(), Status.CLOSED))
+            .assertNext(actual -> assertThat(actual).isTrue())
+            .expectNextCount(0)
+            .verifyComplete();
+
+        StepVerifier.create(this.sut.findById(issue.getId()))
+            .assertNext(actual -> {
+                assertThat(actual.getId()).isEqualTo(issue.getId());
+                assertThat(actual.getVersion()).isEqualTo(2L);
+                assertThat(actual.getStatus()).isEqualTo(Status.CLOSED);
+                assertThat(actual.getTitle()).isEqualTo("issue 1");
+                assertThat(actual.getContent().getBody()).isEqualTo("content 1");
+                assertThat(actual.getContent().getMimeType()).isEqualTo("text/plain");
+            })
+            .expectNextCount(0)
+            .verifyComplete();
+    }
+
+    @Test
     void optimisticLockingFailure(@Autowired TransactionalOperator operator) {
         Issue issue = this.issues.get(0);
         this.sut.save(issue).block();

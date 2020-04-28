@@ -14,7 +14,6 @@ import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.transaction.support.TransactionTemplate;
 import spring.data.jdbc.account.Account;
-import spring.data.jdbc.label.Label;
 import spring.data.jdbc.repo.Repo;
 import spring.data.jdbc.test.DataInitializeExecutionListener;
 
@@ -144,6 +143,57 @@ class IssueRepositoryTest {
     }
 
     @Test
+    void update() {
+        // given
+        Issue issue = this.issues.get(0);
+        this.sut.save(issue);
+
+        IssueContent newContent = new IssueContent("spring-data-jdbc", "text/markdown");
+        issue.changeContent(newContent);
+
+        // when
+        Issue actual = this.sut.save(issue);
+
+        // then
+        assertThat(actual.getVersion()).isEqualTo(2L);
+
+        Optional<Issue> load = this.sut.findById(actual.getId());
+        assertThat(load).isPresent();
+        assertThat(load.get().getId()).isEqualTo(actual.getId());
+        assertThat(load.get().getVersion()).isEqualTo(2L);
+        assertThat(load.get().getRepoId()).isEqualTo(this.repoId);
+        assertThat(load.get().getStatus()).isEqualTo(Status.OPEN);
+        assertThat(load.get().getTitle()).isEqualTo("issue 1");
+        assertThat(load.get().getContent().getBody()).isEqualTo("spring-data-jdbc");
+        assertThat(load.get().getContent().getMimeType()).isEqualTo("text/markdown");
+        assertThat(load.get().getCreatedBy()).isEqualTo(this.creatorId);
+    }
+
+    @Test
+    void changeStatus() {
+        // given
+        Issue issue = this.issues.get(0);
+        this.sut.save(issue);
+
+        // when
+        boolean actual = this.sut.changeStatus(issue.getId(), Status.CLOSED);
+
+        // then
+        assertThat(actual).isTrue();
+
+        Optional<Issue> load = this.sut.findById(issue.getId());
+        assertThat(load).isPresent();
+        assertThat(load.get().getId()).isEqualTo(issue.getId());
+        assertThat(load.get().getVersion()).isEqualTo(2L);
+        assertThat(load.get().getRepoId()).isEqualTo(this.repoId);
+        assertThat(load.get().getStatus()).isEqualTo(Status.CLOSED);
+        assertThat(load.get().getTitle()).isEqualTo("issue 1");
+        assertThat(load.get().getContent().getBody()).isEqualTo("content 1");
+        assertThat(load.get().getContent().getMimeType()).isEqualTo("text/plain");
+        assertThat(load.get().getCreatedBy()).isEqualTo(this.creatorId);
+    }
+
+    @Test
     void optimisticLockingFailure(@Autowired TransactionTemplate transactionTemplate) {
         Issue issue = this.issues.get(0);
         this.sut.save(issue);
@@ -206,7 +256,7 @@ class IssueRepositoryTest {
         // when
         List<Issue> content = this.sut.findByTitleLikeAndStatus("issue%", Status.OPEN, pageable);
         Page<Issue> actual = PageableExecutionUtils.getPage(content, pageable, () ->
-            this.sut.countByTitleLikeAndStatus("issue%",Status.OPEN));
+            this.sut.countByTitleLikeAndStatus("issue%", Status.OPEN));
 
         // then
         assertThat(actual).hasSize(2);
