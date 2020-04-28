@@ -1,0 +1,58 @@
+plugins {
+    id "java"
+    id "groovy"
+}
+
+compileJava {
+    dependsOn compileGroovy
+}
+
+compileGroovy {
+    options.encoding = "UTF-8"
+    groovyOptions.encoding = "UTF-8"
+}
+
+tasks.withType(JavaCompile) { task ->
+    dependsOn task.name.replace("Java", "Groovy")
+}
+
+tasks.withType(GroovyCompile) {
+    dependsOn = []
+}
+
+sourceSets {
+    main {
+        java { srcDirs = [] }
+        groovy { srcDirs += ["src/main/java"] }
+    }
+}
+
+if (project.convention.findPlugin(JavaPluginConvention)) {
+    // Change the output directory for the main and test source sets back to the old path
+    sourceSets.main.java.outputDir = new File(buildDir, "classes/main")
+    sourceSets.main.groovy.outputDir = new File(buildDir, "classes/main")
+    sourceSets.test.java.outputDir = new File(buildDir, "classes/test")
+    sourceSets.test.groovy.outputDir = new File(buildDir, "classes/test")
+}
+
+dependencies {
+    implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-sql:2.0.0.RC2")
+    implementation("com.navercorp.spring:spring-boot-starter-data-jdbc-plus-repository:2.0.0.RC2")
+
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.data:spring-data-jdbc:2.0.0.RC2")
+    implementation("org.springframework.data:spring-data-relational:2.0.0.RC2")
+    implementation("org.springframework.data:spring-data-commons:2.3.0.RC2")
+    implementation("org.liquibase:liquibase-core")
+
+    implementation("org.codehaus.groovy:groovy:3.0.3")
+
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+
+    runtimeOnly("com.h2database:h2")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: "org.junit.vintage", module: "junit-vintage-engine"
+    }
+}

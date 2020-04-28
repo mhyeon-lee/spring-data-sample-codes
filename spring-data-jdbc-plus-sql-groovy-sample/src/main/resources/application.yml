@@ -1,0 +1,9 @@
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/changelog-master.xml
+
+logging:
+  level:
+    org.springframework.jdbc.core: TRACE
+    org.springframework.jdbc.core.StatementCreatorUtils: TRACE

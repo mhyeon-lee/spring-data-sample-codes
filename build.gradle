@@ -1,15 +1,60 @@
-plugins {
-    id "java"
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url "https://repo.spring.io/milestone/"
+        }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.6.RELEASE")
+        classpath("org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1")
+    }
 }
 
-group "com.navercorp"
-version "1.0.0-SNAPSHOT"
-
-sourceCompatibility = 11
-
-repositories {
-    mavenCentral()
+allprojects {
+    group = "com.navercorp"
+    version "1.0.0-SNAPSHOT"
 }
 
-dependencies {
+subprojects {
+    apply plugin: "java"
+    apply plugin: "idea"
+    apply plugin: "io.spring.dependency-management"
+    apply plugin: "maven"
+
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://repo.spring.io/milestone/"
+        }
+        maven {
+            name "navercorp.release"
+            url "http://repo.navercorp.com/maven2/"
+        }
+        maven {
+            name "navercorp.snapshot"
+            url "http://repo.navercorp.com/m2-snapshot-repository/"
+        }
+    }
+
+    dependencies {
+        compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+        testCompile("org.assertj:assertj-core")
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom SpringBootPlugin.BOM_COORDINATES
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
 }

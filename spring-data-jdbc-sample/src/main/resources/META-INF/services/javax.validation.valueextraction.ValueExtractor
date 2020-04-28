@@ -1,0 +1,1 @@
+spring.data.jdbc.support.AggregateReferenceValueExtractor

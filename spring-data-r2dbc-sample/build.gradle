@@ -1,0 +1,22 @@
+dependencies {
+	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("org.springframework.boot:spring-boot-starter-aop")
+	implementation("org.springframework.data:spring-data-r2dbc:1.1.0.RC2")
+	implementation("org.springframework.data:spring-data-relational:2.0.0.RC2")
+	implementation("org.springframework.data:spring-data-commons:2.3.0.RC2")
+	implementation("org.springframework.boot:spring-boot-starter-json")
+	implementation("javax.xml.bind:jaxb-api")
+
+	implementation("io.r2dbc:r2dbc-h2:0.8.3.RELEASE")
+	implementation("org.liquibase:liquibase-core")
+	implementation("com.zaxxer:HikariCP")
+
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
+	
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+		exclude group: "org.junit.vintage", module: "junit-vintage-engine"
+	}
+	testImplementation "io.projectreactor:reactor-test"
+}

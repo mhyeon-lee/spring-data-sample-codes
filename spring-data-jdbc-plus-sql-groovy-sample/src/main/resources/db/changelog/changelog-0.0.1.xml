@@ -1,0 +1,198 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="mhyeon.lee" id="20200428-1">
+        <createTable tableName="ISSUE">
+            <column name="ID" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="REPO_ID" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ISSUE_NO" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STATUS" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TITLE" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATED_BY" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATED_AT" type="TIMESTAMP(6)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="ISSUE" indexName="IX_ISSUE_REPO_ID">
+            <column name="REPO_ID"/>
+        </createIndex>
+        <createIndex tableName="ISSUE" indexName="IX_ISSUE_REPO_ID_ISSUE_NO">
+            <column name="REPO_ID"/>
+            <column name="ISSUE_NO"/>
+        </createIndex>
+        <createIndex tableName="ISSUE" indexName="IX_ISSUE_CREATED_BY">
+            <column name="CREATED_BY"/>
+        </createIndex>
+
+        <createTable tableName="ISSUE_CONTENT">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="BODY" type="CLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MIME_TYPE" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ISSUE_ID" type="VARCHAR(36)">
+                <constraints foreignKeyName="FK_ISSUE_CONTENT_ISSUE_ID"
+                             referencedTableName="ISSUE" referencedColumnNames="ID"
+                             deferrable="false" initiallyDeferred="false"
+                             nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="ISSUE_CONTENT" indexName="IX_ISSUE_CONTENT_ISSUE_ID">
+            <column name="ISSUE_ID"/>
+        </createIndex>
+
+        <createTable tableName="ISSUE_ATTACHED_LABEL">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="LABEL_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ATTACHED_AT" type="TIMESTAMP(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ISSUE_ID" type="VARCHAR(36)">
+                <constraints foreignKeyName="FK_ISSUE_ATTACHED_LABEL_ISSUE_ID"
+                             referencedTableName="ISSUE" referencedColumnNames="ID"
+                             deferrable="false" initiallyDeferred="false"
+                             nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="ISSUE_ATTACHED_LABEL" indexName="IX_ISSUE_ATTACHED_LABEL_ISSUE_ID">
+            <column name="ISSUE_ID"/>
+        </createIndex>
+        <createIndex tableName="ISSUE_ATTACHED_LABEL" indexName="IX_ISSUE_ATTACHED_LABEL_LABEL_ID">
+            <column name="LABEL_ID"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="mhyeon.lee" id="20200428-2">
+        <createTable tableName="LABEL">
+            <column name="ID" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="REPO_ID" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="COLOR" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="LABEL" indexName="IX_LABEL_REPO_ID">
+            <column name="REPO_ID"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="mhyeon.lee" id="20200428-3">
+        <createTable tableName="ACCOUNT">
+            <column name="ID" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="LOGIN_ID" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="UK_ACCOUNT_LOGIN_ID"/>
+            </column>
+            <column name="NAME" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STATE" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EMAIL" type="LONGVARBINARY">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATED_AT" type="TIMESTAMP(6)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="ACCOUNT" indexName="IX_ACCOUNT_LOGIN_ID">
+            <column name="LOGIN_ID"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="mhyeon.lee" id="20200428-4">
+        <createTable tableName="REPO">
+            <column name="ID" type="VARCHAR(200)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="UK_REPO_NAME"/>
+            </column>
+            <column name="DESCRIPTION" type="VARCHAR(255)"/>
+            <column name="CREATED_BY" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATED_AT" type="TIMESTAMP(6)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="REPO" indexName="IX_REPO_NAME">
+            <column name="NAME"/>
+        </createIndex>
+        <createIndex tableName="REPO" indexName="IX_REPO_CREATED_BY">
+            <column name="CREATED_BY"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="mhyeon.lee" id="20200428-5">
+        <createTable tableName="COMMENT">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ISSUE_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATED_BY" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATED_AT" type="TIMESTAMP(6)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="COMMENT" indexName="IX_COMMENT_ISSUE_ID">
+            <column name="ISSUE_ID"/>
+        </createIndex>
+        <createIndex tableName="COMMENT" indexName="IX_COMMENT_CREATED_BY">
+            <column name="CREATED_BY"/>
+        </createIndex>
+        <createTable tableName="COMMENT_CONTENT">
+            <column name="ID" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"
+                             foreignKeyName="FK_COMMENT_CONTENT_ID"
+                             referencedTableName="COMMENT" referencedColumnNames="ID"
+                             deferrable="false" initiallyDeferred="false"/>
+            </column>
+            <column name="BODY" type="CLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MIME_TYPE" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
