@@ -1,5 +1,7 @@
 # Spring Data Sample Codes
 
+[발표 자료](https://docs.google.com/presentation/d/1E7Y_L8TO6ZRZfFjBO6f_GBZxzdV0Klw0XNuH1Kv4JWA/edit)
+
 ![aggregates](./img/aggregate.jpg)
 ![db](./img/db.jpg)
 
